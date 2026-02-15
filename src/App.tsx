@@ -11,7 +11,7 @@ import Ordinances from "./components/Ordinances";
 
 function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/TMO-Admin-Panel">
       <Sidebar />
       <main className="main-content">
         <Routes>
