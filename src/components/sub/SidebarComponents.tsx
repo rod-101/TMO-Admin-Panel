@@ -2,6 +2,8 @@
 import { MenuIcon, FileBarChartIcon } from "./SidebarIcons";
 import { SidebarItem } from "./SidebarItem";
 import { menuItems } from "./MenuItem";
+import logoIcon from "../../assets/itmo-logo-icon.png";
+import logoFull from "../../assets/itmo-logo-full.png";
 
 interface SidebarHeaderProps {
   isCollapsed: boolean;
@@ -35,9 +37,9 @@ export function SidebarHeader({ isCollapsed }: SidebarHeaderProps) {
     <div className="sidebar-header">
       <div className={`logo ${isCollapsed ? "collapsed" : ""}`}>
         {isCollapsed ? (
-          <img alt="iTMO Logo" className="logo-icon" />
+          <img src={logoIcon} alt="iTMO Logo" />
         ) : (
-          <img alt="iTMO Logo" className="logo-full" />
+          <img src={logoFull} alt="iTMO Logo" />
         )}
       </div>
     </div>

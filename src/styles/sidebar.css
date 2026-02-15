@@ -141,13 +141,3 @@
 .sidebar-nav::-webkit-scrollbar-thumb:hover {
   background: #4338ca;
 }
-
-.logo-icon {
-  width: 32px;
-  height: 32px;
-}
-
-.logo-full {
-  width: 120px;
-  height: auto;
-}
