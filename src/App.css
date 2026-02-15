@@ -1,0 +1,10 @@
+#root {
+  width: 100%;
+  background-color: green;
+  display: flex;
+  height: 100vh;
+}
+
+.dashboard-container {
+  background-color: yellow;
+}
