@@ -22,15 +22,11 @@ const ViolationRecords: React.FC = () => {
   const [typeFilter, setTypeFilter] = useState<string>("all");
   const [ticketIdFilter, setTicketIdFilter] = useState<string>("");
   const [nameFilter, setNameFilter] = useState<string>("");
-
-  const statistics: Statistic[] = [
-    { value: "1,280", label: "Issued Tickets" },
-    { value: "65", label: "Unresolved Tickets" },
-    { value: "18%", label: "Repeat Offender Rate" },
-    { value: "94.9%", label: "Resolution Rate" },
-  ];
-
-  const violatorRecords: ViolatorRecord[] = [
+  const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
+  const [editingRecord, setEditingRecord] = useState<ViolatorRecord | null>(
+    null,
+  );
+  const [records, setRecords] = useState<ViolatorRecord[]>([
     {
       id: 1,
       ticketId: "TKT-2025-001",
@@ -130,19 +126,24 @@ const ViolationRecords: React.FC = () => {
       total: "₱900",
       status: "unresolved",
     },
+  ]);
+
+  const statistics: Statistic[] = [
+    { value: "1,280", label: "Issued Tickets" },
+    { value: "65", label: "Unresolved Tickets" },
+    { value: "18%", label: "Repeat Offender Rate" },
+    { value: "94.9%", label: "Resolution Rate" },
   ];
 
   // Get unique violation types
   const violationTypes = useMemo(() => {
-    const types = Array.from(
-      new Set(violatorRecords.map((record) => record.type)),
-    );
+    const types = Array.from(new Set(records.map((record) => record.type)));
     return types.sort();
-  }, []);
+  }, [records]);
 
   // Filter records
   const filteredRecords = useMemo(() => {
-    return violatorRecords.filter((record) => {
+    return records.filter((record) => {
       const matchesStatus =
         statusFilter === "all" || record.status === statusFilter;
       const matchesDate = !dateFilter || record.date.includes(dateFilter);
@@ -161,7 +162,14 @@ const ViolationRecords: React.FC = () => {
         matchesName
       );
     });
-  }, [statusFilter, dateFilter, typeFilter, ticketIdFilter, nameFilter]);
+  }, [
+    records,
+    statusFilter,
+    dateFilter,
+    typeFilter,
+    ticketIdFilter,
+    nameFilter,
+  ]);
 
   const handleResetFilters = () => {
     setStatusFilter("all");
@@ -169,6 +177,46 @@ const ViolationRecords: React.FC = () => {
     setTypeFilter("all");
     setTicketIdFilter("");
     setNameFilter("");
+  };
+
+  const handleEdit = (record: ViolatorRecord) => {
+    setEditingRecord({ ...record });
+    setIsEditModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsEditModalOpen(false);
+    setEditingRecord(null);
+  };
+
+  const handleSave = () => {
+    if (editingRecord) {
+      setRecords(
+        records.map((record) =>
+          record.id === editingRecord.id ? editingRecord : record,
+        ),
+      );
+      handleCloseModal();
+    }
+  };
+
+  const handleDelete = () => {
+    if (
+      editingRecord &&
+      window.confirm("Are you sure you want to delete this record?")
+    ) {
+      setRecords(records.filter((record) => record.id !== editingRecord.id));
+      handleCloseModal();
+    }
+  };
+
+  const handleInputChange = (field: keyof ViolatorRecord, value: string) => {
+    if (editingRecord) {
+      setEditingRecord({
+        ...editingRecord,
+        [field]: value,
+      });
+    }
   };
 
   return (
@@ -272,6 +320,7 @@ const ViolationRecords: React.FC = () => {
                 <th>Date</th>
                 <th>Total</th>
                 <th>Status</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -289,11 +338,19 @@ const ViolationRecords: React.FC = () => {
                         {record.status}
                       </span>
                     </td>
+                    <td>
+                      <button
+                        className="edit-btn"
+                        onClick={() => handleEdit(record)}
+                      >
+                        Edit
+                      </button>
+                    </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan={7} className="no-results">
+                  <td colSpan={8} className="no-results">
                     No records found matching the selected filters.
                   </td>
                 </tr>
@@ -302,6 +359,110 @@ const ViolationRecords: React.FC = () => {
           </table>
         </div>
       </div>
+
+      {/* Edit Modal */}
+      {isEditModalOpen && editingRecord && (
+        <div className="modal-overlay" onClick={handleCloseModal}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Edit Violation Record</h2>
+              <button className="close-btn" onClick={handleCloseModal}>
+                ×
+              </button>
+            </div>
+
+            <div className="modal-body">
+              <div className="form-group">
+                <label htmlFor="edit-ticket-id">Ticket ID</label>
+                <input
+                  id="edit-ticket-id"
+                  type="text"
+                  value={editingRecord.ticketId}
+                  onChange={(e) =>
+                    handleInputChange("ticketId", e.target.value)
+                  }
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="edit-name">Violator Name</label>
+                <input
+                  id="edit-name"
+                  type="text"
+                  value={editingRecord.name}
+                  onChange={(e) => handleInputChange("name", e.target.value)}
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="edit-type">Violation Type</label>
+                <select
+                  id="edit-type"
+                  value={editingRecord.type}
+                  onChange={(e) => handleInputChange("type", e.target.value)}
+                >
+                  {violationTypes.map((type) => (
+                    <option key={type} value={type}>
+                      {type}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="edit-date">Date</label>
+                <input
+                  id="edit-date"
+                  type="date"
+                  value={editingRecord.date}
+                  onChange={(e) => handleInputChange("date", e.target.value)}
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="edit-total">Total Amount</label>
+                <input
+                  id="edit-total"
+                  type="text"
+                  value={editingRecord.total}
+                  onChange={(e) => handleInputChange("total", e.target.value)}
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="edit-status">Status</label>
+                <select
+                  id="edit-status"
+                  value={editingRecord.status}
+                  onChange={(e) =>
+                    handleInputChange(
+                      "status",
+                      e.target.value as "resolved" | "unresolved",
+                    )
+                  }
+                >
+                  <option value="resolved">Resolved</option>
+                  <option value="unresolved">Unresolved</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="modal-footer">
+              <button className="delete-btn" onClick={handleDelete}>
+                Delete
+              </button>
+              <div className="modal-actions">
+                <button className="cancel-btn" onClick={handleCloseModal}>
+                  Cancel
+                </button>
+                <button className="save-btn" onClick={handleSave}>
+                  Save
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
