@@ -2,7 +2,7 @@ import "../styles/dashboard.css";
 
 export default function Dashboard() {
   return (
-    <div className="dashboard">
+    <>
       <div className="dashboard-header">
         <h1>Dashboard</h1>
       </div>
@@ -49,6 +49,6 @@ export default function Dashboard() {
           <p>Real Time System Activity</p>
         </div>
       </section>
-    </div>
+    </>
   );
 }
