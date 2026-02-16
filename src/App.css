@@ -1,10 +1,14 @@
 #root {
   width: 100%;
-  background-color: green;
   display: flex;
   height: 100vh;
 }
 
-.dashboard-container {
-  background-color: yellow;
+.main-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: #f8f9fa;
+  height: 100vh;
+  width: 100%;
 }
