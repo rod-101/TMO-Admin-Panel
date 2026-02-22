@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import "../styles/generateReport.css";
 
-interface ReportConfig {
-  period: "weekly" | "monthly" | "yearly";
-  startDate: string;
-  endDate: string;
-}
+// interface ReportConfig {
+//   period: "weekly" | "monthly" | "yearly";
+//   startDate: string;
+//   endDate: string;
+// }
 
 interface GeneratedReport {
   id: number;

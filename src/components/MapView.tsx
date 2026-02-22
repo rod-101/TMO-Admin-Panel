@@ -13,11 +13,11 @@ interface ViolationLocation {
   fine: string;
 }
 
-interface ViolationType {
-  name: string;
-  color: string;
-  count: number;
-}
+// interface ViolationType {
+//   name: string;
+//   color: string;
+//   count: number;
+// }
 
 const MapView: React.FC = () => {
   const [selectedViolation, setSelectedViolation] =
